@@ -1,15 +1,17 @@
 command:
 - 'python /code/script_iterator.py'
-org: yuval
-#project: 5702926261551104
-project: 5686084218388480
+org: missinglinkdemo
+#project: 5702926261551104 # demo org
+#project: 5686084218388480 # yuval org
+project: 5715594536026112 # missinglinkdemo org
 env:
   EXPERIMENT_NAME: simple-100e-sgd-10-50-lr-0.01
   #QUERY: '@version:aca1a37a00aa7cc4ac10d876f5331ea94300ed06 @seed:1337 @split:0.1:0.2:0.7 @sample:0.2 NOT class:test-multiple_fruits'
   QUERY: '@version:16a28f9834be97373828304d8fb9e3a9ccdd22fa @seed:1337 @split:0.1:0.2:0.7 @sample:0.2'
   CLASS_COUNT: 75
-  #DATA_VOLUME_ID: 5190332048211968
-  DATA_VOLUME_ID: 5685154290860032
+  #DATA_VOLUME_ID: 5190332048211968 # demo org
+  #DATA_VOLUME_ID: 5685154290860032 # yuval org
+  DATA_VOLUME_ID: 5652757822308352 # missinglinkdemo org
   EPOCHS: 100
   BATCH_SIZE: 10
   MODEL: simple

@@ -34,9 +34,6 @@ EXPERIMENT_NAME = os.environ.get("EXPERIMENT_NAME", "")
 EXPERIMENT_NOTE = os.environ.get("EXPERIMENT_NOTE", "")
 DATA_ROOT = os.environ.get('DATA_ROOT', os.path.expanduser('~/sra/data/mldx-small'))
 
-OWNER_ID ='5cbb4c75-b52a-4386-af35-ce9ba735a4bb'
-PROJECT_TOKEN ='ejHztrwUToiIucAA'
-
 # Hyper paramaters
 EPOCHS = int(os.environ.get("EPOCHS", "4"))
 MODEL = os.environ.get("MODEL", "simple")
@@ -47,11 +44,9 @@ OPTIMIZER = os.environ.get("OPTIMIZER", "sgd")
 LEARNING_RATE = float(os.environ.get("LEARNING_RATE", "0.01"))
 CLASS_COUNT = int(os.environ.get("CLASS_COUNT", "11"))
 QUERY = os.environ.get("QUERY", '@seed:1337 @split:0.1:0.2:0.7 @sample:0.2 yummy:True')
-DATA_VOLUME_ID = int(os.environ.get("DATA_VOLUME_ID", "5685154290860032"))
+DATA_VOLUME_ID = int(os.environ.get("DATA_VOLUME_ID", "5652757822308352"))
 
-missinglink_callback = missinglink.KerasCallback(
-    owner_id=OWNER_ID,
-    project_token=PROJECT_TOKEN)
+missinglink_callback = missinglink.KerasCallback(project='5715594536026112')
 
 missinglink_callback.set_properties(
     display_name=EXPERIMENT_NAME,
