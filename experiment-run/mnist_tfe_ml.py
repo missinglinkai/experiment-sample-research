@@ -5,6 +5,16 @@ Based off of https://www.tensorflow.org/tutorials/estimators/cnn
 import numpy as np
 import tensorflow as tf
 
+import missinglink
+
+steps = 1000
+missinglink_project = missinglink.TensorFlowProject()
+missinglink_hooks = missinglink_project.estimator_hooks(
+    # display_name='MNIST multilayer perception',
+    # description='Two fully connected hidden layers',
+    # hyperparams=params.values(),
+)
+
 
 def main(argv=[]):
     tf.logging.set_verbosity(tf.logging.INFO)
@@ -17,7 +27,7 @@ def main(argv=[]):
     eval_labels = np.asarray(test[1], dtype=np.int32)
 
     # Create the Estimator
-    mnist_classifier = tf.estimator.Estimator(model_fn=cnn_model_fn, )
+    mnist_classifier = tf.estimator.Estimator(model_fn=cnn_model_fn)
 
     # Train the model
     train_input_fn = tf.estimator.inputs.numpy_input_fn(
@@ -29,7 +39,7 @@ def main(argv=[]):
 
     mnist_classifier.train(
         input_fn=train_input_fn,
-        steps=1000,
+        steps=steps,
     )
 
     # Evaluate the model and print results
@@ -79,14 +89,19 @@ def cnn_model_fn(features, labels, mode):
 
     # Calculate Loss (for both TRAIN and EVAL modes)
     loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
+    ml_train_hook = missinglink_hooks.create_train_hook(train_steps=steps, monitored_metrics={'loss': loss})
 
     # Configure the Training Op (for TRAIN mode)
     if mode == tf.estimator.ModeKeys.TRAIN:
         optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001)
         train_op = optimizer.minimize(
             loss=loss, global_step=tf.train.get_global_step())
+
         return tf.estimator.EstimatorSpec(
-            mode=mode, loss=loss, train_op=train_op)
+            mode=mode,
+            loss=loss,
+            train_op=train_op,
+            training_hooks=[ml_train_hook])
 
     # EVAL
     # Add evaluation metrics (for EVAL mode)
@@ -95,7 +110,13 @@ def cnn_model_fn(features, labels, mode):
         tf.metrics.accuracy(labels=labels, predictions=predictions["classes"])
     }
     return tf.estimator.EstimatorSpec(
-        mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
+        mode=mode,
+        loss=loss,
+        eval_metric_ops=eval_metric_ops,
+        evaluation_hooks=[
+            # missinglink_hooks.create_test_hook(
+            #     expected=labels, predicted=predictions["classes"])
+        ])
 
 
 if __name__ == "__main__":
