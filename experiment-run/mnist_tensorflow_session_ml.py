@@ -12,6 +12,10 @@ import argparse
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 
+import missinglink
+
+missinglink_project = missinglink.TensorFlowProject()
+
 # Input params
 NUM_CLASSES = 10  # The MNIST dataset has 10 classes, representing the digits 0 through 9.
 IMAGE_SIZE = 28  # The MNIST images are always 28x28 pixels.
@@ -29,6 +33,10 @@ BATCH_SIZE = 100
 # Directory for saving input
 INPUT_DATA_DIR = os.path.join(os.getenv('TEST_TMPDIR', '/tmp'), 'tensorflow/mnist/input_data')
 
+missinglink_project.set_hyperparams(
+    LEARNING_RATE=LEARNING_RATE,
+    BATCH_SIZE=BATCH_SIZE,
+)
 
 def inference(images, hidden1_units, hidden2_units):
     """Build the MNIST model up to where it may be used for inference.
@@ -116,16 +124,20 @@ def run_training():
         session.run(init)
 
         # Start the training loop
-        for step in range(MAX_STEPS):
-            feed_dict = fill_feed_dict(data_sets.train, images_placeholder, labels_placeholder)
+        with missinglink_project.create_experiment() as experiment:
+            for step in experiment.loop(max_iterations=MAX_STEPS):
+                feed_dict = fill_feed_dict(data_sets.train, images_placeholder, labels_placeholder)
 
-            _, loss_value = session.run([train_op, loss], feed_dict=feed_dict)
+                metrics = {'loss': loss, 'acc': eval_correct}
+                with experiment.train(monitored_metrics=metrics):
+                    _, loss_value = session.run([train_op, loss], feed_dict=feed_dict)
 
-            # Validate the model with the validation dataset
-            if (step + 1) % 500 == 0 or (step + 1) == MAX_STEPS:
-                print('Step %d: loss = %.2f' % (step, loss_value))
-                print('Running on validation dataset...')
-                do_eval(session, eval_correct, images_placeholder, labels_placeholder, data_sets.validation)
+                # Validate the model with the validation dataset
+                if (step + 1) % 500 == 0 or (step + 1) == MAX_STEPS:
+                    print('Step %d: loss = %.2f' % (step, loss_value))
+                    print('Running on validation dataset...')
+                    with experiment.validation(monitored_metrics=metrics):
+                        do_eval(session, eval_correct, images_placeholder, labels_placeholder, data_sets.validation)
 
 
 if __name__ == '__main__':
