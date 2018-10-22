@@ -28,7 +28,7 @@ def main(argv=[]):
 
     # Create the Estimator
     mnist_classifier = tf.estimator.Estimator(model_fn=cnn_model_fn)
-
+    import pdb;pdb.set_trace()
     # Train the model
     train_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={"x": train_data},
