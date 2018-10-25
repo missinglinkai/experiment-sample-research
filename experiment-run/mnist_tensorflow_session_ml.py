@@ -27,7 +27,7 @@ HIDDEN2_UNITS = 32
 
 # Training params
 LEARNING_RATE = 0.01
-MAX_STEPS = 4000
+MAX_STEPS = 9000
 BATCH_SIZE = 100
 
 # Directory for saving input
@@ -88,13 +88,15 @@ def do_eval(sess, eval_correct, images_placeholder, labels_placeholder, data_set
         feed_dict = fill_feed_dict(data_set, images_placeholder, labels_placeholder)
         true_count += sess.run(eval_correct, feed_dict=feed_dict)
     precision = float(true_count) / num_examples
-    print('  Num examples: %d  Num correct: %d  Precision @ 1: %0.04f' % (num_examples, true_count, precision))
+    #print('  Num examples: %d  Num correct: %d  Precision @ 1: %0.04f' % (num_examples, true_count, precision))
     return precision
 
 
 def run_training():
     """Train MNIST for a number of steps."""
     data_sets = input_data.read_data_sets(INPUT_DATA_DIR)
+    epoch_size = data_sets.train.num_examples
+    print("Training epoch size {}".format(epoch_size))
 
     with tf.Graph().as_default():
         # Generate placeholders for the images and labels.
@@ -125,19 +127,20 @@ def run_training():
 
         # Start the training loop
         with missinglink_project.create_experiment() as experiment:
-            for step in experiment.loop(max_iterations=MAX_STEPS):
+            for step in experiment.loop(MAX_STEPS):
                 feed_dict = fill_feed_dict(data_sets.train, images_placeholder, labels_placeholder)
 
                 metrics = {'loss': loss, 'acc': eval_correct}
+
                 with experiment.train(monitored_metrics=metrics):
                     _, loss_value = session.run([train_op, loss], feed_dict=feed_dict)
 
+                if step % 200 == 0:
+                    print('Loss = %.2f' % (loss_value))
+
                 # Validate the model with the validation dataset
-                if (step + 1) % 500 == 0 or (step + 1) == MAX_STEPS:
-                    print('Step %d: loss = %.2f' % (step, loss_value))
-                    print('Running on validation dataset...')
-                    with experiment.validation(monitored_metrics=metrics):
-                        do_eval(session, eval_correct, images_placeholder, labels_placeholder, data_sets.validation)
+                with experiment.validation(monitored_metrics=metrics):
+                    do_eval(session, eval_correct, images_placeholder, labels_placeholder, data_sets.validation)
 
 
 if __name__ == '__main__':

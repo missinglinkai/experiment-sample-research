@@ -23,7 +23,7 @@ HIDDEN2_UNITS = 32
 
 # Training params
 LEARNING_RATE = 0.01
-MAX_STEPS = 4000
+MAX_STEPS = 9000
 BATCH_SIZE = 100
 
 # Directory for saving input
@@ -80,7 +80,7 @@ def do_eval(sess, eval_correct, images_placeholder, labels_placeholder, data_set
         feed_dict = fill_feed_dict(data_set, images_placeholder, labels_placeholder)
         true_count += sess.run(eval_correct, feed_dict=feed_dict)
     precision = float(true_count) / num_examples
-    print('  Num examples: %d  Num correct: %d  Precision @ 1: %0.04f' % (num_examples, true_count, precision))
+    #print('  Num examples: %d  Num correct: %d  Precision @ 1: %0.04f' % (num_examples, true_count, precision))
     return precision
 
 
@@ -121,11 +121,11 @@ def run_training():
 
             _, loss_value = session.run([train_op, loss], feed_dict=feed_dict)
 
+            if step % 200 == 0:
+                print('Step {}, Loss {:.2f}'.format(step, loss_value))
+
             # Validate the model with the validation dataset
-            if (step + 1) % 500 == 0 or (step + 1) == MAX_STEPS:
-                print('Step %d: loss = %.2f' % (step, loss_value))
-                print('Running on validation dataset...')
-                do_eval(session, eval_correct, images_placeholder, labels_placeholder, data_sets.validation)
+            do_eval(session, eval_correct, images_placeholder, labels_placeholder, data_sets.validation)
 
 
 if __name__ == '__main__':
