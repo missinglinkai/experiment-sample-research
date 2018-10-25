@@ -35,7 +35,7 @@ EXPERIMENT_NOTE = os.environ.get("EXPERIMENT_NOTE", "")
 DATA_ROOT = os.environ.get('DATA_ROOT', os.path.expanduser('~/sra/data/mldx-small'))
 
 # Hyper paramaters
-EPOCHS = int(os.environ.get("EPOCHS", "4"))
+EPOCHS = int(os.environ.get("EPOCHS", "8"))
 MODEL = os.environ.get("MODEL", "simple")
 SIMPLE_LAYER_DIMENSIONALITY = int(os.environ.get("SIMPLE_LAYER_DIMENSIONALITY", "64"))
 SIMPLE_LAYER_COUNT = int(os.environ.get("SIMPLE_LAYER_COUNT", "0"))
@@ -43,7 +43,7 @@ BATCH_SIZE = int(os.environ.get("BATCH_SIZE", "10"))
 OPTIMIZER = os.environ.get("OPTIMIZER", "sgd")
 LEARNING_RATE = float(os.environ.get("LEARNING_RATE", "0.01"))
 CLASS_COUNT = int(os.environ.get("CLASS_COUNT", "11"))
-QUERY = os.environ.get("QUERY", '@seed:1337 @split:0.1:0.2:0.7 @sample:0.2 yummy:True')
+QUERY = os.environ.get("QUERY", '@version:e9857228776da915d45aca9a5275cf3cd3a5221f @seed:1337 @split:0.1:0.2:0.7 @sample:0.2 yummy:True')
 DATA_VOLUME_ID = int(os.environ.get("DATA_VOLUME_ID", "5652757822308352"))
 
 missinglink_callback = missinglink.KerasCallback(project='5715594536026112')
@@ -104,7 +104,7 @@ def deserialization_callback(file_names, metadatas):
     class_name = metadata['class']
     if class_name not in seen_classes:
         seen_classes[class_name] = len(seen_classes)
-        print("New class: {}".format(class_name))
+        print("New class: {}, total: {}".format(class_name, len(seen_classes)))
     class_index = seen_classes[class_name]
     #class_index = name_to_index[class_name]
     y = one_hot(class_index)
