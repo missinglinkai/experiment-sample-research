@@ -234,7 +234,6 @@ missinglink_callback.set_properties(class_mapping=class_mapping)
 
 evaluate(model)
 
-# Sadly class mapping does not work when it's at the end
 print("Expected {}, seen {} classes".format(CLASS_COUNT, len(seen_classes)))
 
 assert len(seen_classes) == classes_in_training == CLASS_COUNT
